@@ -3,7 +3,7 @@ Contributors: Mat Lipe
 Donate link: http://lipeimagination.info/contact/
 Tags: Go Live, Urls, Domain Changes 
 Requires at least: 3.1
-Tested up to: 3.2.1
+Tested up to: 3.3.1
 Stable tag: 1.2
 
 == Description ==
