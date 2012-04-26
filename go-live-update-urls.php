@@ -5,7 +5,7 @@ Plugin URI: http://lipeimagination.info/
 Description: This Plugin Updates all the URLs in the database to point to the new URL when making your site live or channging domains.
 Author: Mat Lipe
 Author URI: http://lipeimagination/
-Version: 1.2
+Version: 1.2.1
 */
 /*  Copyright 2011 Mat Lipe (mat@lipeimagination.info);
 
