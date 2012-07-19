@@ -3,7 +3,7 @@ Contributors: Mat Lipe
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=paypal%40lipeimagination%2einfo&lc=US&item_name=Go%20Live%20Update%20Urls&no_note=0&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donateCC_LG%2egif%3aNonHostedGuest
 Tags: Go Live, Urls, Domain Changes 
 Requires at least: 3.1
-Tested up to: 3.3.2
+Tested up to: 3.4.1
 Stable tag: 1.2.1.1
 
 == Description ==
@@ -11,11 +11,6 @@ Stable tag: 1.2.1.1
 Goes through the entire database and replaces all instances of the test domain at Go Live time. Can also be used to replace all instances when changing domains.
 
 Allows table by table selection for any issues with widgets/plugins and such.
-
-Goes through the entire database and replaces all instances of the test domain at Go Live time. Can also be used to replace all instances when changing domains.
-
-Allows table by table selection for any issues with widgets/plugins and such.
-
 
 
 == Installation ==
