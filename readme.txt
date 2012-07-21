@@ -34,6 +34,11 @@ Under the settings menu in the dashboard there will be a "Go Live" link.
 There are a few plugins out there that use certain values in the wp-options table which will break of they are changed manually in the database. Sometimes widgets will disappear. If you have some values that must be changed in the wp_options, I have found that you can prevent the disappearing widget problem by going through all of your widgets and clicking save on the bottom of them after you have changed the domain in general settings. You may then run the Update with the wp_options checked. This method is not fool proof, but it has worked on a few instances I have seen an actual need for updated the wp_options table manually.
 
 
+
+== Screenshots ==
+
+1. Screenshot of a tyical settings page. The verbage will change slightly depending on your database structure
+
 == Changelog ==
 
 = 1.3 =
