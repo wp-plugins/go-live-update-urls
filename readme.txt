@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=paypa
 Tags: Go Live, Urls, Domain Changes 
 Requires at least: 3.1
 Tested up to: 3.4.1
-Stable tag: 1.2.1.1
+Stable tag: 1.3
 
 == Description ==
 
@@ -36,6 +36,9 @@ There are a few plugins out there that use certain values in the wp-options tabl
 
 == Changelog ==
 
+= 1.3 =
+* Added support for adding subdomains like www
+
 = 1.2.1 =
 * Added support for other prefixes besides wp_
 
@@ -46,6 +49,9 @@ There are a few plugins out there that use certain values in the wp-options tabl
 * Removed the wp-options table from the tables to be updated.
 
 == Upgrade Notice ==
+
+= 1.3 =
+This Version will allow you to switch to www without having to run it twice
 
 = 1.2.1 =
 This Version will uncheck your options table by default for the wp_options as well as other table prefixes.
