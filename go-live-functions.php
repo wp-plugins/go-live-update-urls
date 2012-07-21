@@ -1,5 +1,9 @@
 <?php
-/** Function for the options page */
+
+
+/**
+* options page
+*/
 function gluu_add_url_options(){
 	add_options_page("Go Live Setings", "Go Live", "manage_options", basename(__FILE__), "gluu_url_options_page");
 }
