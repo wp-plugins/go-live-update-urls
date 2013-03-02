@@ -21,6 +21,7 @@ Version: 2.0
 class GoLiveUpdateUrls{
     var $oldurl = false;
     var $newurl = false;
+    var $double_subdomain = false; //keep track if going to a subdomain
     
     
     function __construct(){
@@ -126,7 +127,7 @@ function gluu_make_the_updates(){
     // If the new domain is the old one with a new subdomain like www
     if( strpos($newurl, $oldurl) != false) {
         list( $subdomain ) = explode( '.', $newurl );
-        $double_subdomain = $subdomain . '.' . $newurl;  //Create a match to what the broken one will be
+        $this->double_subdomain = $subdomain . '.' . $newurl;  //Create a match to what the broken one will be
     }
 
     
@@ -148,8 +149,8 @@ function gluu_make_the_updates(){
                 $wpdb->query($update_query);
                 
                 //Fix the dub dubs if this was the old domain with a new sub
-                if( isset( $double_subdomain ) ){
-                    $update_query = "UPDATE ".$v." SET ".$t->COLUMN_NAME." = replace(".$t->COLUMN_NAME.", '".$double_subdomain."','".$newurl."')";
+                if( isset( $this->double_subdomain ) ){
+                    $update_query = "UPDATE ".$v." SET ".$t->COLUMN_NAME." = replace(".$t->COLUMN_NAME.", '".$this->double_subdomain."','".$newurl."')";
                     //Run the query
                     $wpdb->query($update_query);
                     
@@ -184,14 +185,17 @@ function gluu_make_the_updates(){
         $rows = $wpdb->get_results("SELECT $primary_key_column, $column FROM $table WHERE $column LIKE 'a:%' OR $column LIKE 'o:%'");
         
         foreach( $rows as $row ){
-            $data = @unserialize($row->{$column});
-            if( $data === false ) continue;
-            
-            //Make sure we are dealing with a seralized object
-            if( is_array( $data ) || is_object( $data ) ){
-                $seralized = serialize($this->replaceTree($data, $this->oldurl, $this->newurl));
-                $wpdb->query("UPDATE $table SET $column='$seralized' WHERE $primary_key_column='".$row->{$primary_key_column}."'");     
+            if( is_bool($data = @unserialize($row->{$column})) ) continue;
+
+            $clean = $this->replaceTree($data, $this->oldurl, $this->newurl);
+            //If we switch to a submain we have to run this again to remove the doubles
+            if( $this->double_subdomain ){
+                  $clean = $this->replaceTree($clean, $this->double_subdomain, $this->newurl); 
             }
+            
+            //Add the newly seralized array back into the database
+            $wpdb->query("UPDATE $table SET $column='".serialize($clean)."' WHERE $primary_key_column='".$row->{$primary_key_column}."'");     
+       
         }
     }
     
@@ -207,23 +211,23 @@ function gluu_make_the_updates(){
      * @param array|object|string $data to change
      * @param string $old the old string
      * @param string $new the new string
-     * @param bool [optional] $keys to replace string in keys as well - defaults to false
+     * @param bool [optional] $changeKeys to replace string in keys as well - defaults to false
      * 
      */
-    function replaceTree( $data, $old, $new, $keys = false ){
-        if( !$array = is_array( $data ) && !is_object( $data) ){
+    function replaceTree( $data, $old, $new, $changeKeys = false ){
+        if( !($is_array = is_array( $data )) && !is_object( $data) ){
             return str_replace( $old, $new, $data );            
         }
             
         foreach( $data as $key => $item ){
-            if( $keys ){
+            if( $changeKeys ){
                 $key = str_replace( $old, $new, $key );
+            }
             
-                if( $array ){
-                    $data[$key] = $this->replaceTree($item);
-                } else {
-                    $data->{$key} = $this->replaceTree($item);
-                }
+            if( $is_array  ){
+                    $data[$key] = $this->replaceTree($item, $old, $new);
+            } else {
+                    $data->{$key} = $this->replaceTree($item, $old, $new);
             }
         }
         return $data;
