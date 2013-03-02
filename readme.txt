@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=paypa
 Tags: Go Live, Urls, Domain Changes 
 Requires at least: 3.1
 Tested up to: 3.4.1
-Stable tag: 1.5
+Stable tag: 2.0
 
 == Description ==
 
@@ -27,11 +27,19 @@ e.g.
 
 = Where do you use this plugin? =
 
-Under the settings menu in the dashboard there will be a "Go Live" link.
+Under the Tools menu in the dashboard there will be a "Go Live" link.
 
-= Why does this one uncheck the wp_options table by default? =
+= Why does updating the domain break some plugins? =
 
-There are a few plugins out there that use certain values in the wp-options table which will break of they are changed manually in the database. Sometimes widgets will disappear. If you have some values that must be changed in the wp_options, I have found that you can prevent the disappearing widget problem by going through all of your widgets and clicking save on the bottom of them after you have changed the domain in general settings. You may then run the Update with the wp_options checked. This method is not fool proof, but it has worked on a few instances I have seen an actual need for updated the wp_options table manually.
+Some plugins will store the data in the database seralized which does not allow for easy updating of the data. You may uncheck tables used by such plugins to avoid breakage and then update the urls manually for those plugins. There are future plans to allow for seralized safe updating via table by table selection but currently the only table that is safe is the options table
+
+= How do I know which tables I should not update? =
+
+Most tables will be just fine to update. You may make a backup of your database, run this on all tables and if you run into trouble, restore your database, uncheck tables in sections, and rerun this until you find the culpurit. If you find a particular table gives you trouble, let me know and I will add it to the urgent list for seralized safe updating.
+
+
+
+
 
 
 
@@ -40,6 +48,11 @@ There are a few plugins out there that use certain values in the wp-options tabl
 1. Screenshot of a tyical settings page. The verbage will change slightly depending on your database structure
 
 == Changelog ==
+= 2.0 =
+* Made updating the options table seralized safe *
+* Add extending ability of views and css *
+* Moved the Admin page to the Tools Section *
+* Improved the structure to allow for future changes *
 
 = 1.5 =
 * Added support for automatically keeping email addresses intact when switching to a subdomain like www
