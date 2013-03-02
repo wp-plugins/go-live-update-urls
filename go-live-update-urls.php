@@ -136,7 +136,6 @@ function gluu_make_the_updates(){
         //Send the options table through the seralized safe Update
         if( $v == $wpdb->options ){
           $this->UpdateSeralizedTable($wpdb->options, 'option_value'); 
-          continue;  
         }
         
         if($v != 'submit' && $v != 'oldurl' && $v != 'newurl'){
@@ -166,50 +165,74 @@ function gluu_make_the_updates(){
 }
 
 
-/**
- * Goes through a table line by line and updates it
- * 
- * @uses for tables which may contain seralized arrays
- * @since 2.0
- * 
- * @param string $table the table to go through
- * @param string $column to column in the table to go through
- * 
- * @TODO Make go through all columns if not specifed. Currently only Works when Specified
- */
-function UpdateSeralizedTable( $table, $column = false ){
-    global $wpdb;
+    /**
+     * Goes through a table line by line and updates it
+     * 
+     * @uses for tables which may contain seralized arrays
+     * @since 2.0
+     * 
+     * @param string $table the table to go through
+     * @param string $column to column in the table to go through
+     *
+     */
+    function UpdateSeralizedTable( $table, $column = false ){
+        global $wpdb;
+        $pk = $wpdb->get_results("SHOW KEYS FROM $table WHERE Key_name = 'PRIMARY'");
+        $primary_key_column = $pk[0]->Column_name;
 
-    $pk = $wpdb->get_results("SHOW KEYS FROM $table WHERE Key_name = 'PRIMARY'");
-    $primary_key_column = $pk[0]->Column_name;
-
-    $rows = $wpdb->get_results("SELECT $primary_key_column, $column FROM $table");
-    
-    
-    
-#-- Start Here
-    foreach( $rows as $row ){
-        $data = unserialize($row[$column]);
-        if( is_array( $data ) ){
+        //Get all the Seralized Rows and Replace them properly
+        $rows = $wpdb->get_results("SELECT $primary_key_column, $column FROM $table WHERE $column LIKE 'a:%' OR $column LIKE 'o:%'");
+        
+        foreach( $rows as $row ){
+            $data = @unserialize($row->{$column});
+            if( $data === false ) continue;
             
-            ## need this to loop through each array and sub array
-            ## create a looping method to call itself
-            
-            ## each array key needs to be converted one at a time then set back to the original array
-            ## If false or not array simply switch the value and set it back to result
-          
+            //Make sure we are dealing with a seralized object
+            if( is_array( $data ) || is_object( $data ) ){
+                $seralized = serialize($this->replaceTree($data, $this->oldurl, $this->newurl));
+                $wpdb->query("UPDATE $table SET $column='$seralized' WHERE $primary_key_column='".$row->{$primary_key_column}."'");     
+            }
         }
     }
     
     
-    _p( $r ); 
+    
+    /**
+     * Replaces all the urls in a multi dementional array or Object
+     * 
+     * @uses itself to call each level of the array
+     * @uses $oldurl and $newurl Class Vars
+     * @since 2.0
+     * 
+     * @param array|object|string $data to change
+     * @param string $old the old string
+     * @param string $new the new string
+     * @param bool [optional] $keys to replace string in keys as well - defaults to false
+     * 
+     */
+    function replaceTree( $data, $old, $new, $keys = false ){
+        if( !$array = is_array( $data ) && !is_object( $data) ){
+            return str_replace( $old, $new, $data );            
+        }
+            
+        foreach( $data as $key => $item ){
+            if( $keys ){
+                $key = str_replace( $old, $new, $key );
+            
+                if( $array ){
+                    $data[$key] = $this->replaceTree($item);
+                } else {
+                    $data->{$key} = $this->replaceTree($item);
+                }
+            }
+        }
+        return $data;
+    }
     
     
-}
-
-
+    
 
 }
 
-$GoLiveUpdateUrls = new GoLiveUpdateUrls;
+$GoLiveUpdateUrls = new GoLiveUpdateUrls();
 	
