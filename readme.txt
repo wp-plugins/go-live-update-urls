@@ -8,9 +8,28 @@ Stable tag: 2.0
 
 == Description ==
 
-Goes through the entire database and replaces all instances of the test domain at Go Live time. Can also be used to replace all instances when changing domains.
+Goes through entire site and replaces all instances of and old url with a new one. Used to change the domain of a site.
 
-Allows table by table selection for any issues with widgets/plugins and such.
+Some of the features this plugin offers:
+
+* Database table by table selection in case of issues
+* Supports seralized data in the options table
+* Very easy to use admin page - which may be found under Tools
+
+Updates Entire Site including:
+
+* Posts
+* Pages
+* Image urls
+* Excerpts
+* Post Meta data
+* Custom Post Types
+* Widgets and widget data
+* Site settings
+* And much more
+
+The admin screen is extendable for developers familiar with using filters or template overrides. 
+	
 
 
 == Installation ==
