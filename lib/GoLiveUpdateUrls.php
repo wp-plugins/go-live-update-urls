@@ -185,7 +185,7 @@ function gluu_make_the_updates(){
      * Goes through a table line by line and updates it
      * 
      * @uses for tables which may contain seralized arrays
-     * @since 2.0
+     * @since 2.1
      * 
      * @param string $table the table to go through
      * @param string $column to column in the table to go through
@@ -197,7 +197,7 @@ function gluu_make_the_updates(){
         $primary_key_column = $pk[0]->Column_name;
 
         //Get all the Seralized Rows and Replace them properly
-        $rows = $wpdb->get_results("SELECT $primary_key_column, $column FROM $table WHERE $column LIKE 'a:%' OR $column LIKE 'o:%'");
+        $rows = $wpdb->get_results("SELECT $primary_key_column, $column FROM $table WHERE $column LIKE 'a:%' OR $column LIKE 'O:%'");
         
         foreach( $rows as $row ){
             if( is_bool($data = @unserialize($row->{$column})) ) continue;
