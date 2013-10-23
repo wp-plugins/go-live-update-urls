@@ -1,3 +1,13 @@
+/**
+ * Main Admin screen css
+ * 
+ * @author Mat Lipe
+ * 
+ * @uses may be overridden in your theme by putting a copy of this file inside a go-live-update-urls folder
+ */
+
+
+
 #gluu{
     background: black;
     padding: 25px;

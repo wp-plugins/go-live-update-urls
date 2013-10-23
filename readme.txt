@@ -4,11 +4,13 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=paypa
 Tags: Go Live, Urls, Domain Changes 
 Requires at least: 3.1
 Tested up to: 3.6.1
-Stable tag: 2.3.0
+Stable tag: 2.4.0
 
 == Description ==
 
 Goes through entire site and replaces all instances of and old url with a new one. Used to change the domain of a site.
+
+Works on both multisite and single site installs.
 
 Some of the features this plugin offers:
 
@@ -64,6 +66,12 @@ Most tables will be just fine to update. You may make a backup of your database,
 1. Screenshot of a tyical settings page. The verbage will change slightly depending on your database structure
 
 == Changelog ==
+
+= 2.4 =
+* Added multisite support
+* Added an uncheck all tables button
+* Enhanced Security
+
 = 2.3 =
 * Added Post Meta to Seralized Safe to coincide with Simple Links Version 2.0
 
@@ -93,6 +101,10 @@ Most tables will be just fine to update. You may make a backup of your database,
 * Removed the wp-options table from the tables to be updated.
 
 == Upgrade Notice ==
+
+= 2.4 =
+This Version works properly on mulitsite
+Enhanced Security - you should probably update
 
 = 1.5 -
 This Version will automatically keep email addresses intact when switch to a subdomain like www

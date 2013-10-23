@@ -4,7 +4,7 @@
  * @author Mat Lipe
  * @since 2.2
  * 
- * @since 9.22.13
+ * @since 10.22.13
  * 
  * @TODO Cleanup the Names and formatting
  */
@@ -21,16 +21,17 @@ class GoLiveUpdateUrls{
     /**
      * @since 2.2
      * 
-     * @since 9.22.13
+     * @since 10.22.13
      */
     function __construct(){
         global $wpdb;
-        $pf = $wpdb->base_prefix;
+        $pf = $wpdb->prefix;
         //Add the settings to the admin menu
         add_action('admin_menu', array( $this,'gluu_add_url_options') );
         
         //Add the CSS
         add_action( 'admin_head', array( $this,'css') );
+
         
         //default tables with seralized data
         $this->seralized_tables = array( 
@@ -38,8 +39,27 @@ class GoLiveUpdateUrls{
              $pf.'postmeta'     => 'meta_value', //post meta data - since 2.3.0
              $pf.'rg_form_meta' => 'display_meta' //gravity forms
         ); 
-                                
+                    
     }
+    
+    
+    /**
+     * Retrieve filtered list of seralize safe database tables
+     *
+     * @since 2.4.0
+     * 
+     * @filters apply_filters( 'gluu-seralized-tables', $this->seralized_tables ); - effects makeCheckBoxes as well
+     *
+     * @return array( %table_name% => %table_column% )
+     */
+    function getSerializedTables(){
+        static $tables = false;
+        if( $tables ) return $tables;
+        
+        return $tables = apply_filters( 'gluu-seralized-tables', $this->seralized_tables );
+  
+    }
+    
     
     /**
      * For adding Css to the admin 
@@ -77,6 +97,12 @@ class GoLiveUpdateUrls{
 
         //If the Form has been submitted make the updates
         if( isset( $_POST['gluu-submit'] ) ){
+
+           check_admin_referer(plugin_basename( __FILE__ ), 'gluu-manage-options');
+            
+           if( !wp_verify_nonce($_POST[ 'gluu-manage-options' ], plugin_basename(__FILE__)) ){
+               wp_die('Ouch! That hurt! You should not be here!' );
+           }
             $this->oldurl = trim( strip_tags( $_POST['oldurl'] ) );
             $this->newurl = trim( strip_tags( $_POST['newurl'] ) );
         
@@ -87,6 +113,8 @@ class GoLiveUpdateUrls{
             }
         }
         
+        $nonce = wp_nonce_field( plugin_basename( __FILE__ ), 'gluu-manage-options', true, false );
+        
         require( $this->fileHyercy('admin-tools-page.php') );
 } 
 
@@ -94,11 +122,11 @@ class GoLiveUpdateUrls{
    /**
     * Allows for Overwritting files in the child theme
     * @since 2.0
-    * @param string $file the name of the file to overwrite
     * 
-    * @param bool $url if the file is being used for a url
+    * @since 10.22.13
+    * @param string $file the name of the file to overwrite
     */  
-    function fileHyercy( $file , $url = false){
+    function fileHyercy( $file){
         if ( !$theme_file = locate_template(array('go-live-update-urls/'.$file)) ) {
              $theme_file = GLUU_VIEWS_DIR . $file;
         } 
@@ -112,22 +140,38 @@ class GoLiveUpdateUrls{
     * Creates a list of checkboxes for each table
     * 
     * @since 2.2
+    * 
+    * @since 10.22.13
     * @uses by the view admin-tools-page.php
     * 
     * @filter 'gluu_table_checkboxes' with 2 param
     *     * $output - the html formatted checkboxes
     *     * $tables - the complete tables object
     * 
-    * @filter apply_filters( 'gluu-seralized-tables', $this->seralized_tables ); - effect teh make the updates as well
     */
     function makeCheckBoxes(){ 
          global $wpdb;
-         $god_query = "SELECT TABLE_NAME FROM information_schema.TABLES where TABLE_SCHEMA='".$wpdb->dbname."'"; 
+
+         $god_query = "SELECT TABLE_NAME FROM information_schema.TABLES where TABLE_SCHEMA='".$wpdb->dbname."' AND TABLE_NAME LIKE '".$wpdb->prefix."%'"; 
+         
+         
+         //Done this way because like wp_% will return all other tables as well such as wp_2
+         if( is_multisite() ){
+            if( $wpdb->blogid == 1 ){
+                for( $i = 1; $i <= 100; $i++ ){
+                    $not_like .= "'".$wpdb->prefix.$i."',";
+                }
+                $not_like = substr($not_like, 0, -1);
+                $god_query .= ' AND SUBSTRING(TABLE_NAME,1,4) NOT IN ('. $not_like .') AND SUBSTRING(TABLE_NAME,1,5) NOT IN ('. $not_like .')';
+            }
+         }
+         
+         
          $tables = $wpdb->get_results($god_query);
          
          $output =  '<ul id="gluu-checkboxes">';
          
-         $seralized_tables = apply_filters( 'gluu-seralized-tables', $this->seralized_tables );
+         $seralized_tables = $this->getSerializedTables();
          
           foreach($tables as $v){
              if(in_array( $v->TABLE_NAME, array_keys($seralized_tables)) ){
@@ -148,9 +192,9 @@ class GoLiveUpdateUrls{
  * Updates the datbase
  * 
  * @uses the oldurl and newurl set above
- * @since 9.22.13
+ * @since 10.22.13
  * 
- * @filters apply_filters( 'gluu-seralized-tables', $this->seralized_tables ); - effects makeCheckBoxes as well
+
  */
 function makeTheUpdates(){
     
@@ -175,7 +219,7 @@ function makeTheUpdates(){
         $this->double_subdomain = $subdomain . '.' . $newurl;  //Create a match to what the broken one will be
     }
 
-    $seralized_tables = apply_filters( 'gluu-seralized-tables', $this->seralized_tables );
+    $seralized_tables = $this->getSerializedTables();
 
     
     //Go throuch each table sent to be updated
