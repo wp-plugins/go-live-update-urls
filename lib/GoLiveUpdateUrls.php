@@ -4,7 +4,7 @@
  * @author Mat Lipe
  * @since 2.2
  * 
- * @since 10.23.13
+ * @since 2.26.14
  * 
  * @TODO Cleanup the Names and formatting
  */
@@ -267,7 +267,7 @@ function makeTheUpdates(){
      * @param string $table the table to go through
      * @param string $column to column in the table to go through
      * 
-     * @since 4.8.13
+     * @since 2.26.14
      *
      */
     function UpdateSeralizedTable( $table, $column = false ){
@@ -290,8 +290,10 @@ function makeTheUpdates(){
             if( $this->double_subdomain ){
                   $clean = $this->replaceTree($clean, $this->double_subdomain, $this->newurl); 
             }
+			
+			$clean = @serialize($clean);
 
-           $wpdb->query($wpdb->prepare( "UPDATE $table SET $column=%s WHERE $primary_key_column=%s", @serialize($clean), $row->{$primary_key_column} ) ); 
+            $wpdb->query($wpdb->prepare( "UPDATE $table SET $column=%s WHERE $primary_key_column=%s", $clean, $row->{$primary_key_column} ) ); 
            
         }
     }
